@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 *.txt
 *.log
+=======
+*.log
+token.txt
+>>>>>>> 54d40cbed23af0031a0f5a86fe82993ae957a7d5
