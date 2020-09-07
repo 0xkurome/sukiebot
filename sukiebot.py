@@ -7,7 +7,6 @@ import asyncio
 import logging
 import datetime
 import sys
-import json
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
@@ -96,14 +95,6 @@ async def on_member_join(member):
 	for channel in member.server.channels:
 		if str(channel) == "main-chat":
 			await bot.send_message(f"""Welcome to =! 1337 server! {member.mention}""")
-	#when new user join the server, we wanna set its xp & lvl to 0
-	with open('users.json', 'r') as f: #so we gotta load the json file
-		users = json.load(f)
-
-	await update_data(users, member)
-
-	with open('users.json', 'w') as f: #and set the new user into the json file
-		json.dump(users, f)
 
 @bot.event
 async def on_member_remove(member):
@@ -132,23 +123,11 @@ async def on_message(message):
 	elif "oof" in message.content.lower():
 		await message.channel.send("chill gin")
 
-	if(message.author.id != 508031670847275044):
-		#on every msg we wanna update the user's xp
-		with open('users.json', 'r') as f:
-			users = json.load(f)
-
-		await update_data(users, message.author) #update the user's data in the json file
-		await add_xp(users, message.author, 5) #soon will be change to random num
-		await level_up(users, message.author, message)
-
-		with open('users.json', 'w') as f:
-			json.dump(users, f)
-
 
 @bot.event # reposts messages that user deletes
 async def on_message_delete(message):
 	if message.author != bot.user:
-	#if "$clear" == message.content.lower():
+	#if "$clear" == message.content.lower():    
 		await message.channel.send(f"@{message.author} Why did you delete: ```{message.content}```")
 
 		await bot.process_commands(message)
@@ -163,31 +142,7 @@ async def on_member_update(before, after):
 				await after.edit(nick=last)
 			else:
 				await after.edit(nick="You're not Duck Master")
-
-"""
-ranking system yo yo
-"""
-@bot.event
-async def update_data(users, user):
-	print(str(user.id) in users)
-	if not str(user.id) in users:
-		users[str(user.id)] = {} #create new user in the json
-		users[str(user.id)]['xp'] = 0 #set the new user's xp to 0
-		users[str(user.id)]['level'] = 1 #set the new user's level to 0
-@bot.event
-async def add_xp(users, user, xp):
-	print(type(users[str(user.id)]['xp']))
-	users[str(user.id)]['xp'] += xp
-@bot.event
-async def level_up(users, user, msg):
-	xp = users[str(user.id)]['xp']
-	level_start = users[str(user.id)]['level']
-	level_end = int(xp ** (1/4))
-
-	if level_start < level_end:
-		await msg.channel.send('{} has leveled up to level {}'.format(user.mention, level_end))
-		users[str(user.id)]['level'] = level_end
-
+ 
 
 
 bot.run(token)
